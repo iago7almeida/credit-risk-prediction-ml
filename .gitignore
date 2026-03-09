@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints
+.env
+.venv
+venv/
+
+# data/*.csv
+
+
+# Ignore artefacts from Machine Learning
+models/*.pkl
+models/*.joblib

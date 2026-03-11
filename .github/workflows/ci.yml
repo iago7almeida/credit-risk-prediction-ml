@@ -1,0 +1,51 @@
+name: MLOps CI/CD Pipeline
+
+# 1. Gatilho: Quando essa automação vai rodar?
+on:
+  push:
+    branches:
+      - main # Roda sempre que houver um push na branch principal
+
+jobs:
+  testar-api-modelo:
+    runs-on: ubuntu-latest # Cria uma máquina virtual Linux novinha do zero
+
+    steps:
+      - name: 📥 1. Clonar o repositório
+        uses: actions/checkout@v4
+
+      - name: 🐍 2. Configurar o Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # Versão estável (pode ajustar para a sua)
+
+      - name: 📦 3. Instalar Dependências e Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-playwright
+          playwright install --with-deps
+
+      - name: ☁️ 4. Configurar Credenciais da AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: ⬇️ 5. Baixar o Modelo do S3
+        # A API precisa do .pkl para ligar, então baixamos ele do bucket antes
+        run: |
+          mkdir -p models
+          aws s3 cp s3://credit-risk-prediction-ml-bucket/modelos_producao/modelo_risco_credito_v1.pkl models/modelo_risco_credito_v1.pkl
+
+      - name: 🚀 6. Ligar a API em Background
+        # O '&' no final do comando faz a API rodar em segundo plano liberando o terminal
+        run: |
+          uvicorn api:app --host 127.0.0.1 --port 8000 &
+          sleep 10 # Dá 10 segundos para o servidor respirar e carregar o modelo gigante
+
+      - name: 🧪 7. Disparar Testes Automatizados
+
+        run: |
+          pytest test_api.py -s -v

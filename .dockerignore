@@ -1,0 +1,11 @@
+# Ignorar pastas de controle de versão
+.git
+.github
+
+# Ignorar ambientes virtuais
+venv/
+env/
+__pycache__/
+
+# Ignorar arquivos temporários de testes
+.pytest_cache/

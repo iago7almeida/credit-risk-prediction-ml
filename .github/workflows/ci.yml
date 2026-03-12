@@ -1,6 +1,6 @@
 name: MLOps CI/CD Pipeline
 
-# 1. Gatilho: Quando essa automação vai rodar?
+# 1. Gatilho
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   testar-api-modelo:
-    runs-on: ubuntu-latest # Cria uma máquina virtual Linux novinha do zero
+    runs-on: ubuntu-22.04
 
     steps:
       - name: 📥 1. Clonar o repositório
@@ -17,7 +17,7 @@ jobs:
       - name: 🐍 2. Configurar o Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Versão estável (pode ajustar para a sua)
+          python-version: '3.10' # Versão estável
 
       - name: 📦 3. Instalar Dependências e Playwright
         run: |
